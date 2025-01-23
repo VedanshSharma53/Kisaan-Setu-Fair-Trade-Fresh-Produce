@@ -1,9 +1,11 @@
 <% layout("/layouts/boilerplate") %>
 <script>
     const mapToken = "<%= process.env.MAP_TOKEN %>";
-    const listing = '<%- JSON.stringify(listing) %>';
-
+    const listing = <%- JSON.stringify(listing) %>;
+    const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>;
+    console.log(coordinates);
 </script>
+
 <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
 <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
 <div class="row mt-3 show-container">
@@ -26,7 +28,7 @@
             </p>
             <p class="card-text">
                 <b>Price : </b>
-                 &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
+                 &#8377; <%= listing.price.toLocaleString("en-IN") %> / quintal
             </p>
             <p class="card-text">
                 <b>Location : </b>
@@ -36,6 +38,14 @@
                 <b>Country : </b>
                 <%= listing.country %>
             </p>
+            <form id="payment-form">
+                <div id="card-element"><!-- Stripe.js injects the Card Element --></div>
+                <button type="submit">Pay Now</button>
+            </form>
+            <script src="https://js.stripe.com/v3/"></script>
+            <script src="/js/payment.js"></script>
+            
+            
         </div>
     </div>
     <br>
@@ -126,13 +136,10 @@
 
         <hr style="margin: 10px 0px;">
 
-        <div class="col-sm-8 offset-sm-2 mb-3 ">
-            <div class="tittle map-tittle">
-                <h3>Where you'll be </h3>
-                <i class="fa-regular fa-compass fa-spin fa-2xs" style="color: #000000;"></i></i>
+        <div class="col-8 offset-0 mb-3 mt-3">
+            <h3>Place of listing</h3>
+            <div id="map"></div>
             </div>
-            <div id='map' style='width: 400px; height: 300px;'></div>
-        </div>
 </div>
 
 <script src="/js/map.js"></script>

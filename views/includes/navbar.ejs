@@ -114,7 +114,7 @@
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
   <div class="container-nav">
     <a class="navbar-brand" href="/listings" style="font-family: 'Roboto', sans-serif; font-size: 24px; font-weight: bold; color: #4CAF50;">
-      <i class="fa-solid fa-seedling"></i> Kisaan Setu
+      <i class="fa-solid fa-seedling"></i> Kisaan Seva
     </a>
     
 
@@ -148,8 +148,8 @@
         <% if(!currUser) { %>
         <a class="nav-link" href="/signup"><b>Sign up</b></a>
         <a class="nav-link" href="/login"><b>Log in</b></a>
-        <a class="nav-link" href="/profile"><b>Profile</b></a>
         <% } %> <% if(currUser) { %>
+          <a href="/profile" class="nav-link"><b>Profile</b></a>
         <a class="nav-link" href="/logout"><b>Log out</b></a>
         <% } %>
       </div>

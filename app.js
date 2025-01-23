@@ -19,8 +19,9 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const { url } = require("inspector");
 
-const dbUrl = "mongodb://127.0.0.1:27017/farmer";
+const dbUrl = process.env.ATLASDB_URL;
 
 main()
     .then(() => {
@@ -28,6 +29,8 @@ main()
     })
     .catch((err) => {
         console.log(err);
+        console.log("Database Not Connected!!");
+        
     })
 
 async function main() {
@@ -90,6 +93,7 @@ app.use((req, res, next) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+// app.use("/payment",payroute);
 
 
 app.all("*", (req,res,next) => {
@@ -105,4 +109,8 @@ app.use((err, req, res, next) => {
 
 app.listen(8080, () => {
     console.log("server is listening to port 8080");
+    const deployURL = "http://localhost:8080";
+    console.log(`App is live at ${deployURL}`);
+    
+    
 });

@@ -180,8 +180,8 @@ body{
 
 /* Map */
 #map{
-    height: 500px;
-    width: 110vh;
+    height: 400px;
+    width: 600px;
     border-radius: 1rem;
     border: 1px solid rgba(0, 128, 0, 0.428);
     margin: 20px auto;

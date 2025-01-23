@@ -3,9 +3,22 @@ const Schema = mongoose.Schema;
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const userSchema = new Schema({
-    email: {
-        type: String,
-        required: true,
+    // email: {
+    //     type: String,
+    //     required: true,
+    // }
+    name: String,
+    email: String,
+    password: String,
+    listings: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Listing'
+        }
+    ],
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 
