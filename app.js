@@ -21,7 +21,7 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const { url } = require("inspector");
 
-const dbUrl = process.env.ATLASDB_URL;
+const dbUrl = process.env.MONGODB_URL;
 
 main()
     .then(() => {

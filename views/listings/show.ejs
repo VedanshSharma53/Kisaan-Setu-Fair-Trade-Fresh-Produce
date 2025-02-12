@@ -1,9 +1,10 @@
 <% layout("/layouts/boilerplate") %>
 <script>
-    const mapToken = "<%= process.env.MAP_TOKEN %>";
+    const mapToken = '<%= process.env.MAP_TOKEN %>';
     const listing = <%- JSON.stringify(listing) %>;
     const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>;
     console.log(coordinates);
+    console.log(mapToken);
 </script>
 
 <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>

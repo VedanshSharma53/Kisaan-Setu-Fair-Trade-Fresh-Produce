@@ -1,32 +1,34 @@
-const express = require('express');
+const express = require("express");
+const Razorpay = require("razorpay");
+require("dotenv").config();
+
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const Listing = require('../models/listing');
 
-router.post('/create-payment-intent/:id', async (req, res) => {
-    const { id } = req.params;
-    const listing = await Listing.findById(id);
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
-    if (!listing) {
-        return res.status(404).send('Listing not found');
-    }
-
+// Route to create a Razorpay order
+router.post("/", async (req, res) => {
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: listing.price * 100, // Convert to cents
-            currency: 'usd',
-            automatic_payment_methods: {
-                enabled: true,
-            },
+        const { amount } = req.body;
+        const order = await razorpay.orders.create({
+            amount: amount * 100, // Razorpay expects amount in paisa
+            currency: "INR",
+            payment_capture: 1, 
         });
 
-        res.send({
-            clientSecret: paymentIntent.client_secret,
-        });
+        res.json(order);
     } catch (error) {
-        console.error('Error creating payment intent:', error);
-        res.status(500).send('Internal Server Error');
+        console.error("Error creating order:", error);
+        res.status(500).json({ error: "Failed to create payment order" });
     }
+});
+
+// Route to handle successful payments (optional)
+router.get("/success", (req, res) => {
+    res.send("Payment Successful! Thank you for your purchase.");
 });
 
 module.exports = router;

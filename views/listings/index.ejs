@@ -1,5 +1,7 @@
 <% layout("/layouts/boilerplate") %>
-<style></style>
+<style>
+  
+</style>
 <script src="https://kit.fontawesome.com/170a24bd9a.js" crossorigin="anonymous"></script>
 <div id="filters">
   <div class="scrollable-tabs-container">
@@ -269,5 +271,20 @@ document.addEventListener("DOMContentLoaded", () => {
     dragging = false;
     filterContainer.classList.remove("dragging");
   })
+
+  document.getElementById("priceToggle").addEventListener("change", function() {
+    let prices = document.querySelectorAll(".price-info");
+    prices.forEach(priceInfo => {
+      let basePrice = parseFloat(priceInfo.dataset.basePrice);
+      let newPrice = this.checked ? basePrice * 0.95 : basePrice;
+      priceInfo.innerHTML = `&#8377; ${newPrice.toLocaleString("en-IN")} /quintal`;
+    });
+  });
+  function scrollLeft() {
+    document.querySelector(".filter-container").scrollLeft -= 200;
+  }
+  function scrollRight() {
+    document.querySelector(".filter-container").scrollLeft += 200;
+  }
 
 </script>
