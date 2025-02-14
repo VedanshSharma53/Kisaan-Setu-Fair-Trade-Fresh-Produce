@@ -1,12 +1,43 @@
 <% layout("/layouts/boilerplate") %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     const mapToken = '<%= process.env.MAP_TOKEN %>';
     const listing = <%- JSON.stringify(listing) %>;
     const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>;
     console.log(coordinates);
     console.log(mapToken);
-</script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("pay-btn").addEventListener("click", async function () {
+            const response = await fetch("/payment/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: <%= listing.price %> })
+            });
 
+            const order = await response.json();
+
+            const options = {
+                key: "<%= process.env.RAZORPAY_KEY_ID %>",
+                amount: order.amount,
+                currency: "INR",
+                name: "KisaanSeva",
+                description: "<%= listing.title %>",
+                order_id: order.id,
+                handler: function (response) {
+                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                    window.location.href = "/payment/success";
+                },
+                prefill: {
+                    name: "<%= currUser.username %>",
+                    email: "<%= currUser.email %>",
+                }
+            };
+
+            const rzp1 = new Razorpay(options);
+            rzp1.open();
+        });
+    });
+</script>
 <script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
 <link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
 <div class="row mt-3 show-container">
@@ -39,9 +70,8 @@
                 <b>Country : </b>
                 <%= listing.country %>
             </p>
-            <form id="payment-form">
-                <div id="card-element"><!-- Stripe.js injects the Card Element --></div>
-                <button type="submit">Pay Now</button>
+            <form id="razorpay-payment-form">
+                <button type="button" id="pay-btn">Pay Now</button>
             </form>
             <script src="https://js.stripe.com/v3/"></script>
             <script src="/js/payment.js"></script>
@@ -144,4 +174,5 @@
 </div>
 
 <script src="/js/map.js"></script>
+<script src="/js/script.js"></script>
 
