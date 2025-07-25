@@ -84,6 +84,34 @@
   .back-to-listings:hover {
     color: #0056b3;
   }
+
+  /* Purchase Section */
+  .purchase-card {
+    border: 2px solid #28a745;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  .purchase-card:hover {
+    transform: scale(1.02);
+  }
+
+  .badge-success {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .badge-warning {
+    background-color: #ffc107;
+    color: black;
+  }
+
+  .text-muted {
+    color: #6c757d !important;
+  }
 </style>
 
 <!-- Profile Content -->
@@ -95,6 +123,8 @@
     <p><strong>Name:</strong> <%= user.username %></p>
     <p><strong>Email:</strong> <%= user.email %></p>
     <p><strong>Joined:</strong> <%= user.createdAt.toDateString() %></p>
+    <p><strong>Total Listings:</strong> <%= user.listings ? user.listings.length : 0 %></p>
+    <p><strong>Total Purchases:</strong> <%= user.purchases ? user.purchases.length : 0 %></p>
   </div>
 
   <h2>Your Listings</h2>
@@ -122,6 +152,39 @@
       <% } %>
     <% } else { %>
       <p>You have not added any crops!!</p>
+    <% } %>
+  </div>
+
+  <h2 class="mt-5">Your Purchases</h2>
+  <div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-3 mt-3">
+    <% if (user.purchases && user.purchases.length > 0) { %>
+      <% for (purchase of user.purchases) { %>
+        <div class="card purchase-card">
+          <img
+            src="<%= purchase.listing.image.url %>"
+            class="card-img-top"
+            alt="purchase"
+            style="height: 20rem"
+          />
+          <div class="card-body">
+            <p class="card-text">
+              <b><%= purchase.listing.title %></b><br />
+              <span class="price-info">
+                &#8377; <%= purchase.amount.toLocaleString("en-IN") %>
+              </span><br />
+              <small class="text-muted">
+                Purchased: <%= purchase.purchaseDate.toDateString() %><br />
+                Payment ID: <%= purchase.paymentId %><br />
+                Status: <span class="badge badge-<%= purchase.status === 'completed' ? 'success' : 'warning' %>">
+                  <%= purchase.status %>
+                </span>
+              </small>
+            </p>
+          </div>
+        </div>
+      <% } %>
+    <% } else { %>
+      <p>You haven't made any purchases yet.</p>
     <% } %>
   </div>
 

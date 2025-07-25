@@ -7,39 +7,122 @@
     console.log(coordinates);
     console.log(mapToken);
     document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("pay-btn").addEventListener("click", async function () {
-            const response = await fetch("/payment/create-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: <%= listing.price %> })
-            });
+        const payBtn = document.getElementById("pay-btn");
+        if (payBtn) {
+            payBtn.addEventListener("click", async function () {
+            try {
+                const response = await fetch("/payment/create-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: <%= listing.price %> })
+                });
 
-            const order = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const order = await response.json();
+                
+                if (order.error) {
+                    throw new Error(order.error);
+                }
+
+                // Check if Razorpay key is configured
+                const razorpayKey = "<%= process.env.RAZORPAY_KEY_ID || '' %>";
+                if (!razorpayKey) {
+                    throw new Error("Payment gateway not configured. Please contact administrator.");
+                }
 
             const options = {
-                key: "<%= process.env.RAZORPAY_KEY_ID %>",
+                key: "<%= process.env.RAZORPAY_KEY_ID || '' %>",
                 amount: order.amount,
                 currency: "INR",
                 name: "KisaanSeva",
                 description: "<%= listing.title %>",
                 order_id: order.id,
                 handler: function (response) {
-                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                    window.location.href = "/payment/success";
+                    // Verify payment on server side
+                    verifyPayment(response);
                 },
                 prefill: {
-                    name: "<%= currUser.username %>",
-                    email: "<%= currUser.email %>",
+                    name: "<%= currUser ? currUser.username : '' %>",
+                    email: "<%= currUser ? currUser.email : '' %>",
+                },
+                modal: {
+                    ondismiss: function() {
+                        console.log('Payment modal closed');
+                    }
                 }
             };
 
             const rzp1 = new Razorpay(options);
             rzp1.open();
+            } catch (error) {
+                console.error("Payment error:", error);
+                alert("Failed to create payment order. Please try again.");
+            }
         });
+        }
+
+        // Function to verify payment
+        async function verifyPayment(response) {
+            try {
+                const verifyResponse = await fetch("/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                });
+
+                const verificationResult = await verifyResponse.json();
+                
+                if (verificationResult.verified) {
+                    // Create purchase record
+                    await createPurchaseRecord(response);
+                    
+                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                    window.location.href = "/payment/success?payment_id=" + response.razorpay_payment_id;
+                } else {
+                    alert("Payment verification failed. Please contact support.");
+                }
+            } catch (error) {
+                console.error("Payment verification error:", error);
+                alert("Payment verification failed. Please contact support.");
+            }
+        }
+
+        // Function to create purchase record
+        async function createPurchaseRecord(response) {
+            try {
+                const purchaseResponse = await fetch("/purchases/create", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        listingId: "<%= listing._id %>",
+                        amount: <%= listing.price %>,
+                        paymentId: response.razorpay_payment_id,
+                        orderId: response.razorpay_order_id,
+                        quantity: 1
+                    })
+                });
+
+                const purchaseResult = await purchaseResponse.json();
+                
+                if (purchaseResult.success) {
+                    console.log("Purchase record created successfully");
+                } else {
+                    console.error("Failed to create purchase record:", purchaseResult.error);
+                }
+            } catch (error) {
+                console.error("Error creating purchase record:", error);
+            }
+        }
     });
 </script>
-<script src='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js'></script>
-<link href='https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css' rel='stylesheet' />
+<!-- Map scripts loaded in boilerplate -->
 <div class="row mt-3 show-container">
     <div class="col-sm-8 offset-sm-2 tittle">
         <h3>
@@ -70,9 +153,18 @@
                 <b>Country : </b>
                 <%= listing.country %>
             </p>
-            <form id="razorpay-payment-form">
-                <button type="button" id="pay-btn">Pay Now</button>
-            </form>
+            <% if(currUser) { %>
+                <form id="razorpay-payment-form">
+                    <button type="button" id="pay-btn" class="btn btn-success">
+                        <i class="fas fa-credit-card"></i> Pay Now - ₹<%= listing.price.toLocaleString("en-IN") %>
+                    </button>
+                </form>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <a href="/login" class="alert-link">Login</a> to purchase this product.
+                </div>
+            <% } %>
             <script src="https://js.stripe.com/v3/"></script>
             <script src="/js/payment.js"></script>
             
@@ -170,9 +262,13 @@
         <div class="col-8 offset-0 mb-3 mt-3">
             <h3>Place of listing</h3>
             <div id="map"></div>
+            <div id="map-fallback" style="display: none; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
+                <i class="fas fa-map-marker-alt" style="font-size: 2rem; color: #239e46;"></i>
+                <p>Location: <%= listing.location %></p>
+                <p>Coordinates: <%= listing.geometry ? listing.geometry.coordinates.join(', ') : 'Not available' %></p>
             </div>
+        </div>
 </div>
 
-<script src="/js/map.js"></script>
 <script src="/js/script.js"></script>
 

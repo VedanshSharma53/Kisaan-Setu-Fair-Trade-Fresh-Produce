@@ -49,7 +49,17 @@ module.exports.viewProfile = async (req, res) => {
     try {
         // Assuming that the User model is already required at the top of the file
         const userId = req.user._id;
-        const user = await User.findById(userId).populate('listings').exec();
+        const user = await User.findById(userId)
+            .populate('listings')
+            .populate({
+                path: 'purchases',
+                populate: {
+                    path: 'listing',
+                    select: 'title image price location country'
+                }
+            })
+            .exec();
+            
         const listing = await Listing.findById(userId);
         if(!listing){
             req.flash("No listings!!")

@@ -4,17 +4,24 @@ body{
     flex-direction: column;
     min-height: 100vh;
     color: black;
+    padding-top: 0; /* Remove body padding, handle spacing in specific components */
+    /* Performance optimizations */
+    will-change: auto;
+    contain: layout style;
 }
 
 .container{
     flex: 1;
     min-height: 80vh;
+    padding-top: 1rem; /* Add minimal top padding to prevent navbar overlap */
 }
 
-/* Navbar */
+/* Navbar - Updated for mobile responsiveness */
 .navbar{
-    height: 5rem;
+    min-height: 60px;
     background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 0.5rem; /* Add small margin to navbar */
 }
 
 .fa-compass{
@@ -31,24 +38,30 @@ body{
 }
 
 .container-nav{
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  position: relative;
 }
 
 .navbar-brand {
-  left: 15px;
-    position: absolute;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4CAF50;
+  text-decoration: none;
 }
 
-.navbar-nav{
-  margin: 0 auto;
-  width: 393px;
+.search-container {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 1rem;
 }
 
 #togglerLable{
-  position: absolute;
-    right: 15px;
-    top: 0;
+  position: relative;
+  z-index: 1001;
 }
 
 /* footer */
@@ -129,6 +142,11 @@ body{
 
 .listing-link {
     text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.listing-link:hover {
+    opacity: 0.8;
 }
 
 .map-tittle {
@@ -268,6 +286,7 @@ body{
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin: 0.5rem 0 1rem 0; /* Reduce top margin to minimize extra space */
   }
 
   .scrollable-tabs-container{
@@ -346,7 +365,7 @@ body{
 
   .filter {
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 1rem; /* Reduce from 2rem to 1rem */
       opacity: 0.7;
       margin-left: 0.7rem;
       margin-right: 0.7rem;
@@ -522,6 +541,36 @@ body{
 
 .del{
   margin-left: 10px !important;
+}
+
+/* Mobile navbar fixes */
+.navbar {
+  padding: 0.5rem;
+}
+
+.container-nav {
+  flex-wrap: wrap;
+}
+
+.search-container {
+  order: 3;
+  max-width: 100%;
+  margin: 0.5rem 0 0 0;
+}
+
+.navbar-brand {
+  font-size: 1.1rem;
+}
+
+.nav-profile {
+  right: 0.5rem;
+  min-width: 8rem;
+  top: calc(100% + 0.5rem);
+}
+
+/* Adjust body padding for mobile */
+body {
+  padding-top: 0; /* Remove mobile body padding to eliminate extra space */
 }
     
   }

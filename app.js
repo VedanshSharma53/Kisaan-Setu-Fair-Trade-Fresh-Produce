@@ -20,6 +20,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const payroute = require("./routes/payment.js");
+const purchaseRouter = require("./routes/purchase.js");
 const { url } = require("inspector");
 
 const dbUrl = process.env.ATLASDB_URL;
@@ -41,6 +42,7 @@ async function main() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
@@ -95,6 +97,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/payment", payroute);
+app.use("/purchases", purchaseRouter);
 // app.use("/payment",payroute);
 
 

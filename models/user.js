@@ -16,6 +16,12 @@ const userSchema = new Schema({
             ref: 'Listing'
         }
     ],
+    purchases: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Purchase'
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
