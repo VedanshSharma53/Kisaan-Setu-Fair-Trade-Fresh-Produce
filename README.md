@@ -1,4 +1,4 @@
-# 🌾 Kisaan-Setu: Fair Trade Fresh Produce Platform
+# 🌾 Kisaan-Seva: Fair Trade Fresh Produce Platform
 
 A comprehensive e-commerce platform connecting farmers directly with consumers for fair trade fresh produce. Built with Node.js, Express, and MongoDB.
 
